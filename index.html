@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f2">
+  <title>Common Table | Food rescue, coordinated</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202821;
+      --muted: #788179;
+      --line: #e7eae3;
+      --paper: #fff;
+      --canvas: #f6f7f2;
+      --green: #2c6849;
+      --green-dark: #214f38;
+      --mint: #e7f2e9;
+      --lime: #d3ef9c;
+      --orange: #e98a55;
+      --orange-pale: #fff0e7;
+      --blue: #547a8a;
+      --blue-pale: #eaf2f4;
+      --shadow: 0 8px 26px rgba(27, 44, 32, .045);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--canvas); font: 14px/1.45 "DM Sans", sans-serif; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 228px minmax(0, 1fr); }
+    .sidebar { background: #fff; border-right: 1px solid var(--line); padding: 26px 15px 20px; display: flex; flex-direction: column; }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 0 10px 29px; font: 800 17px/1 "Manrope", sans-serif; letter-spacing: -.5px; }
+    .brand-mark { width: 31px; height: 31px; border-radius: 10px 10px 10px 3px; display: grid; place-items: center; color: #fff; background: var(--green); }
+    .brand-mark svg { width: 18px; height: 18px; }
+    .workspace-label { padding: 0 11px 9px; color: #a0a69e; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.15px; }
+    .nav { display: grid; gap: 4px; }
+    .nav button { width: 100%; display: flex; align-items: center; gap: 12px; border: 0; border-radius: 7px; padding: 10px 11px; color: #68716a; text-align: left; background: transparent; font-weight: 600; }
+    .nav button:hover { color: var(--ink); background: #f6f7f4; }
+    .nav button.active { color: var(--green-dark); background: var(--mint); }
+    .nav svg { width: 17px; height: 17px; stroke-width: 1.8; }
+    .nav-count { margin-left: auto; font-size: 11px; color: #81897f; }
+    .sidebar-bottom { margin-top: auto; }
+    .help-card { margin: 0 5px 15px; padding: 14px; border-radius: 7px; background: #f5f8f2; }
+    .help-card strong { display: block; font-size: 12px; margin-bottom: 4px; }
+    .help-card p { margin: 0 0 11px; color: var(--muted); font-size: 11px; }
+    .help-card button { border: 0; padding: 0; background: none; color: var(--green); font-size: 11px; font-weight: 700; }
+    .profile { display: flex; align-items: center; gap: 10px; padding: 16px 9px 0; border-top: 1px solid var(--line); }
+    .avatar { flex: 0 0 32px; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: #bc7959; font-size: 11px; font-weight: 700; }
+    .profile strong { display: block; font-size: 11px; }
+    .profile small { color: var(--muted); font-size: 10px; }
+    main { min-width: 0; padding: 0 38px 44px; }
+    .topbar { height: 69px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .crumb { color: #929991; font-size: 12px; }
+    .crumb b { color: #4a544c; font-weight: 600; }
+    .top-actions { display: flex; align-items: center; gap: 17px; }
+    .location { display: inline-flex; gap: 7px; align-items: center; color: #646e65; font-size: 12px; }
+    .location svg { width: 15px; height: 15px; }
+    .icon-button { position: relative; width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: #606a61; background: #fff; }
+    .icon-button svg { width: 16px; height: 16px; }
+    .notification-dot { position: absolute; width: 7px; height: 7px; top: 6px; right: 6px; background: var(--orange); border: 1px solid #fff; border-radius: 50%; }
+    .page-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; padding: 27px 0 20px; }
+    .eyebrow { color: var(--green); font-size: 10px; letter-spacing: 1.25px; font-weight: 700; text-transform: uppercase; }
+    h1 { margin: 3px 0 2px; font: 700 25px/1.2 "Manrope", sans-serif; letter-spacing: -.75px; }
+    .page-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 5px; padding: 10px 14px; color: #fff; background: var(--green); font-size: 12px; font-weight: 700; transition: background .16s, transform .16s; }
+    .primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .primary svg { width: 15px; height: 15px; }
+    .impact { min-height: 112px; overflow: hidden; position: relative; display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; align-items: center; gap: 18px; padding: 20px 24px; border-radius: 7px; color: #fff; background: var(--green); }
+    .impact::after { content: ""; position: absolute; width: 260px; height: 260px; right: 14%; top: -176px; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; box-shadow: 0 0 0 25px rgba(255,255,255,.035), 0 0 0 53px rgba(255,255,255,.035); pointer-events: none; }
+    .impact-intro { position: relative; z-index: 1; }
+    .impact-intro span { color: #c9e6d0; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .impact-intro strong { display: block; margin-top: 4px; font: 700 17px/1.25 "Manrope", sans-serif; }
+    .impact-stat { position: relative; z-index: 1; padding-left: 19px; border-left: 1px solid rgba(255,255,255,.22); }
+    .impact-stat strong { display: block; font: 700 22px/1.2 "Manrope", sans-serif; }
+    .impact-stat span { display: block; margin-top: 4px; color: #c9e6d0; font-size: 10px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 16px 0 22px; }
+    .metric { min-height: 83px; display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+    .metric-icon { flex: 0 0 34px; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 6px; color: var(--green); background: var(--mint); }
+    .metric-icon.orange { color: #b55f32; background: var(--orange-pale); }
+    .metric-icon.blue { color: var(--blue); background: var(--blue-pale); }
+    .metric-icon svg { width: 17px; height: 17px; }
+    .metric strong { display: block; font: 700 19px/1.1 "Manrope", sans-serif; }
+    .metric span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .metric em { color: var(--green); font-style: normal; font-size: 10px; font-weight: 700; }
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(265px, .9fr); gap: 17px; align-items: start; }
+    .panel { min-width: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); box-shadow: var(--shadow); }
+    .panel-head { min-height: 59px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 17px; border-bottom: 1px solid var(--line); }
+    .panel-title { font: 700 13px/1.2 "Manrope", sans-serif; }
+    .panel-subtitle { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .text-button { display: inline-flex; align-items: center; gap: 5px; border: 0; color: var(--green); background: none; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .text-button svg { width: 13px; height: 13px; }
+    .list-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 9px; padding: 11px 16px; border-bottom: 1px solid var(--line); }
+    .filters { display: flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+    .filter { border: 0; border-radius: 4px; padding: 6px 9px; color: #717a71; background: transparent; font-size: 10px; white-space: nowrap; }
+    .filter.active { color: var(--green-dark); background: var(--mint); font-weight: 700; }
+    .search { width: 154px; height: 29px; display: flex; align-items: center; gap: 6px; padding: 0 8px; border: 1px solid var(--line); border-radius: 4px; color: #8b938b; }
+    .search svg { flex: 0 0 13px; width: 13px; height: 13px; }
+    .search input { width: 100%; min-width: 0; border: 0; outline: 0; color: var(--ink); font-size: 10px; background: transparent; }
+    .search input::placeholder { color: #a0a69f; }
+    .listing { display: grid; grid-template-columns: 73px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 13px 16px; border-bottom: 1px solid #eff0ec; }
+    .listing[hidden] { display: none; }
+    .listing:last-child { border-bottom: 0; }
+    .food-photo { width: 73px; height: 67px; object-fit: cover; border-radius: 4px; background: #e8ede7; }
+    .listing-main { min-width: 0; }
+    .listing-title-row { display: flex; align-items: center; gap: 7px; min-width: 0; }
+    .listing-title { overflow: hidden; color: #29332b; font-size: 11px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .badge { flex: 0 0 auto; border-radius: 3px; padding: 3px 5px; color: #39704d; background: #edf5e9; font-size: 8px; font-weight: 700; }
+    .badge.urgent { color: #b15d32; background: #fff0e7; }
+    .listing-meta { display: flex; flex-wrap: wrap; gap: 4px 11px; margin-top: 5px; color: #858d85; font-size: 9px; }
+    .listing-meta span { display: inline-flex; align-items: center; gap: 4px; }
+    .listing-meta svg { width: 11px; height: 11px; }
+    .listing-org { margin-top: 5px; color: #626c63; font-size: 9px; }
+    .listing-action { text-align: right; }
+    .qty { display: block; color: #3a443c; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .listing-action button { margin-top: 6px; border: 1px solid #dfe7df; border-radius: 4px; padding: 5px 8px; color: var(--green); background: #fff; font-size: 9px; font-weight: 700; }
+    .listing-action button:hover { border-color: var(--green); background: #f6faf5; }
+    .empty-state { padding: 30px 18px; text-align: center; color: var(--muted); font-size: 11px; }
+    .right-stack { display: grid; gap: 16px; }
+    .pickup-list { padding: 3px 16px 8px; }
+    .pickup { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid #eff0ec; }
+    .pickup:last-child { border-bottom: 0; }
+    .time-chip { padding: 6px 0; border-radius: 4px; color: var(--green); background: #edf5e9; text-align: center; font-size: 9px; font-weight: 700; }
+    .pickup strong { display: block; font-size: 10px; }
+    .pickup small { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .pickup-state { color: #8b938b; font-size: 9px; white-space: nowrap; }
+    .demand-list { padding: 5px 16px 8px; }
+    .demand { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 9px 0; border-bottom: 1px solid #eff0ec; }
+    .demand:last-child { border-bottom: 0; }
+    .demand-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: var(--blue); background: var(--blue-pale); font-size: 9px; font-weight: 700; }
+    .demand strong { display: block; font-size: 9px; }
+    .demand small { display: block; margin-top: 2px; color: var(--muted); font-size: 8px; }
+    .need { color: #4e7656; font-size: 9px; font-weight: 700; white-space: nowrap; }
+    .workspace-page { display: none; animation: page-in .22s ease-out; }
+    .workspace-page.active { display: block; }
+    @keyframes page-in { from { opacity: .4; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    main[data-view="Donations"] .impact,
+    main[data-view="Donations"] .metric-grid,
+    main[data-view="Donations"] .right-stack { display: none; }
+    main[data-view="Donations"] .content-grid { grid-template-columns: minmax(0, 1fr); }
+    main[data-view="Needs"] .page-heading,
+    main[data-view="Needs"] .impact,
+    main[data-view="Needs"] .metric-grid,
+    main[data-view="Needs"] .content-grid,
+    main[data-view="Pickups"] .page-heading,
+    main[data-view="Pickups"] .impact,
+    main[data-view="Pickups"] .metric-grid,
+    main[data-view="Pickups"] .content-grid { display: none; }
+    .subpage-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; padding: 27px 0 20px; }
+    .subpage-heading h1 { margin-top: 4px; }
+    .subpage-heading p { max-width: 520px; margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+    .board-summary { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 0 17px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+    .board-summary > div { padding: 16px 19px; border-right: 1px solid var(--line); }
+    .board-summary > div:last-child { border-right: 0; }
+    .board-summary strong { display: block; font: 700 20px/1.1 "Manrope", sans-serif; }
+    .board-summary span { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; }
+    .need-toolbar, .pickup-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .board-label { color: #727b72; font-size: 11px; font-weight: 600; }
+    .board-filters { display: flex; flex-wrap: wrap; gap: 5px; }
+    .board-filter { border: 1px solid #e3e8e1; border-radius: 4px; padding: 7px 10px; color: #667067; background: white; font-size: 10px; }
+    .board-filter:hover, .board-filter.active { border-color: #b7d0bc; color: var(--green-dark); background: var(--mint); }
+    .need-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+    .need-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 6px; background: white; box-shadow: var(--shadow); }
+    .need-card[hidden], .pickup-card[hidden] { display: none; }
+    .need-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .need-card .demand-icon { width: 35px; height: 35px; font-size: 10px; }
+    .priority { border-radius: 3px; padding: 4px 6px; color: #a44f2d; background: var(--orange-pale); font-size: 8px; font-weight: 700; }
+    .priority.normal { color: #477150; background: var(--mint); }
+    .need-card h2 { margin: 14px 0 2px; font: 700 14px "Manrope", sans-serif; }
+    .need-address { color: var(--muted); font-size: 10px; }
+    .need-request { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 15px 0 10px; padding: 11px; border-radius: 4px; color: #375640; background: #f3f7ef; }
+    .need-request span { font-size: 10px; }
+    .need-request strong { font: 700 13px "Manrope", sans-serif; }
+    .need-card p { min-height: 34px; margin: 10px 0 14px; color: #778078; font-size: 10px; }
+    .need-card .primary { width: 100%; padding: 9px; font-size: 10px; }
+    .pickup-board { display: grid; gap: 10px; }
+    .pickup-card { display: grid; grid-template-columns: 90px minmax(0, 1fr) minmax(150px, auto); align-items: center; gap: 17px; padding: 16px 19px; border: 1px solid var(--line); border-radius: 6px; background: #fff; box-shadow: var(--shadow); }
+    .pickup-card[hidden] { display: none; }
+    .pickup-date-block { padding: 10px 8px; border-radius: 5px; color: var(--green-dark); background: var(--mint); text-align: center; }
+    .pickup-date-block strong { display: block; font: 700 19px/1 "Manrope", sans-serif; }
+    .pickup-date-block span { display: block; margin-top: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+    .pickup-info h2 { margin: 0; font: 700 13px "Manrope", sans-serif; }
+    .pickup-info p { margin: 4px 0; color: #687269; font-size: 10px; }
+    .pickup-info small { color: #919890; font-size: 9px; }
+    .pickup-status { display: inline-flex; align-items: center; gap: 5px; color: #527457; font-size: 9px; font-weight: 700; }
+    .pickup-status::before { width: 6px; height: 6px; border-radius: 50%; background: #76a47a; content: ""; }
+    .pickup-card.completed .pickup-status { color: #7c857d; }
+    .pickup-card.completed .pickup-status::before { background: #9da69e; }
+    .pickup-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 9px; }
+    .pickup-actions button { border: 1px solid #dfe7df; border-radius: 4px; padding: 6px 9px; color: var(--green); background: #fff; font-size: 9px; font-weight: 700; }
+    .pickup-actions button:hover { border-color: var(--green); }
+    .pickup-actions .complete-pickup { color: white; background: var(--green); border-color: var(--green); }
+    .pickup-card.completed .complete-pickup { color: #707970; background: #f3f5f2; border-color: #e4e8e2; }
+    .toast { position: fixed; right: 22px; bottom: 20px; z-index: 5; max-width: min(360px, calc(100vw - 32px)); padding: 12px 16px; border-radius: 5px; color: #fff; background: #263d2e; box-shadow: 0 6px 24px #17231b33; font-size: 12px; opacity: 0; transform: translateY(9px); pointer-events: none; transition: .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    dialog { width: min(460px, calc(100% - 28px)); padding: 0; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); box-shadow: 0 20px 70px #17231b36; }
+    dialog::backdrop { background: #15241b77; }
+    .dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 17px 20px; border-bottom: 1px solid var(--line); }
+    .dialog-head h2 { margin: 0; font: 700 16px "Manrope", sans-serif; }
+    .close-dialog { width: 30px; height: 30px; border: 0; border-radius: 50%; background: #f3f5f1; color: #657067; font-size: 18px; }
+    .donation-form { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 18px 20px 20px; }
+    .field { display: grid; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { color: #626c63; font-size: 10px; font-weight: 700; }
+    .field input, .field select { width: 100%; height: 37px; border: 1px solid #dfe4dc; border-radius: 4px; padding: 0 10px; outline: none; color: var(--ink); background: white; font-size: 11px; }
+    .field input:focus, .field select:focus { border-color: var(--green); box-shadow: 0 0 0 2px #2c68491c; }
+    .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; padding-top: 5px; }
+    .secondary { border: 1px solid var(--line); border-radius: 4px; padding: 9px 13px; color: #58625a; background: #fff; font-size: 11px; font-weight: 600; }
+    @media (max-width: 1050px) {
+      .shell { grid-template-columns: 190px minmax(0, 1fr); }
+      main { padding-right: 24px; padding-left: 24px; }
+      .content-grid { grid-template-columns: minmax(0, 1.4fr) minmax(245px, .8fr); gap: 12px; }
+      .metric-grid { gap: 8px; }
+      .metric { padding: 10px; gap: 8px; }
+      .metric-icon { flex-basis: 30px; width: 30px; height: 30px; }
+    }
+    @media (max-width: 780px) {
+      .shell { display: block; padding-bottom: 62px; }
+      .sidebar { position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; height: 58px; padding: 5px 8px; border-top: 1px solid var(--line); border-right: 0; }
+      .brand, .workspace-label, .sidebar-bottom { display: none; }
+      .nav { height: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+      .nav button { flex-direction: column; justify-content: center; gap: 2px; padding: 3px; font-size: 9px; }
+      .nav svg { width: 17px; height: 17px; }
+      .nav-count { display: none; }
+      main { padding: 0 20px 28px; }
+      .impact { grid-template-columns: 1.2fr 1fr 1fr; }
+      .impact-stat:last-child { display: none; }
+      .content-grid { grid-template-columns: 1fr; }
+      .right-stack { grid-template-columns: 1fr 1fr; }
+      .need-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pickup-card { grid-template-columns: 76px minmax(0, 1fr) auto; gap: 12px; }
+      .pickup-actions { flex-direction: column; align-items: stretch; }
+    }
+    @media (max-width: 540px) {
+      main { padding: 0 13px 22px; }
+      .topbar { height: 56px; }
+      .location { max-width: 150px; overflow: hidden; white-space: nowrap; }
+      .top-actions { gap: 9px; }
+      .page-heading { align-items: flex-start; padding: 22px 0 15px; }
+      h1 { font-size: 22px; }
+      .page-heading p { max-width: 220px; }
+      .page-heading .primary { padding: 9px 10px; font-size: 10px; white-space: nowrap; }
+      .impact { min-height: 96px; gap: 10px; padding: 16px 14px; }
+      .impact-intro strong { font-size: 14px; }
+      .impact-stat { padding-left: 10px; }
+      .impact-stat strong { font-size: 18px; }
+      .metric-grid { grid-template-columns: 1fr 1fr; margin-top: 11px; gap: 7px; }
+      .metric { min-height: 69px; }
+      .metric strong { font-size: 17px; }
+      .metric span { font-size: 9px; }
+      .list-toolbar { flex-wrap: wrap; padding: 9px 11px; }
+      .filters { width: 100%; }
+      .search { width: 100%; }
+      .listing { grid-template-columns: 58px minmax(0, 1fr); gap: 9px; padding: 11px; }
+      .food-photo { width: 58px; height: 58px; }
+      .listing-action { grid-column: 2; display: flex; justify-content: space-between; align-items: center; text-align: left; margin-top: -3px; }
+      .listing-action button { margin-top: 0; }
+      .listing-org { margin-top: 4px; }
+      .right-stack { grid-template-columns: 1fr; }
+      .subpage-heading { align-items: flex-start; padding: 22px 0 15px; }
+      .board-summary > div { padding: 13px 10px; }
+      .board-summary strong { font-size: 17px; }
+      .board-summary span { font-size: 9px; }
+      .need-grid { grid-template-columns: 1fr; }
+      .need-card p { min-height: 0; }
+      .need-toolbar, .pickup-toolbar { align-items: flex-start; flex-direction: column; }
+      .pickup-card { grid-template-columns: 60px minmax(0, 1fr); gap: 10px; padding: 12px; }
+      .pickup-date-block { padding: 8px 4px; }
+      .pickup-date-block strong { font-size: 17px; }
+      .pickup-card > div:last-child { grid-column: 2; }
+      .pickup-actions { flex-direction: row; justify-content: flex-start; }
+      .panel-head { padding-right: 12px; padding-left: 12px; }
+      .toast { right: 12px; bottom: 72px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20c-5.2-2.8-7.5-6.1-7.5-9.2A4.3 4.3 0 0 1 12 8.3a4.3 4.3 0 0 1 7.5 2.5c0 3.1-2.3 6.4-7.5 9.2Z"/><path d="M12 8c0-2.3 1.1-4 3.4-5"/></svg></span>common table</div>
+      <div class="workspace-label">Workspace</div>
+      <nav class="nav">
+        <button class="active" data-nav="Overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/><rect x="3" y="14" width="8" height="7" rx="1"/></svg>Overview</button>
+        <button data-nav="Donations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"/><path d="m4.5 7.8 7.5 4.3 7.5-4.3M12 12v8.5"/></svg>Donations<span class="nav-count">12</span></button>
+        <button data-nav="Needs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s-8-4.4-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.6-8 11-8 11Z"/><path d="M8 12h8"/></svg>Community needs</button>
+        <button data-nav="Pickups"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h11v12H3zM14 10h4l3 3v5h-7z"/><circle cx="7.5" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/></svg>Pickups<span class="nav-count">4</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card"><strong>Grow your impact</strong><p>Invite a local business to join the table.</p><button id="inviteButton">Invite a partner <span aria-hidden="true">&#8594;</span></button></div>
+        <div class="profile"><div class="avatar">JM</div><div><strong>Jordan Miller</strong><small>Neighborhood coordinator</small></div></div>
+      </div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div class="crumb">Workspace <span aria-hidden="true">/</span> <b id="breadcrumbCurrent">Overview</b></div>
+        <div class="top-actions">
+          <span class="location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>Eastside, Portland</span>
+          <button class="icon-button" id="notifications" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="notification-dot"></span></button>
+        </div>
+      </div>
+      <section class="page-heading">
+        <div><div class="eyebrow" id="todayLabel"></div><h1 id="pageTitle">Good morning, Jordan</h1><p id="pageDescription">Here’s what’s happening across your neighborhood today.</p></div>
+        <button class="primary" id="openDonation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Post donation</button>
+      </section>
+      <section class="impact" aria-label="Community impact this month">
+        <div class="impact-intro"><span>October community impact</span><strong>Good food, shared well.</strong></div>
+        <div class="impact-stat"><strong>1,284 <small style="font-size:12px;font-weight:500">lb</small></strong><span>food rescued</span></div>
+        <div class="impact-stat"><strong>386</strong><span>neighbors supported</span></div>
+        <div class="impact-stat"><strong>42</strong><span>local partners</span></div>
+      </section>
+      <section class="metric-grid" aria-label="Today's overview">
+        <div class="metric"><div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"/><path d="m4.5 7.8 7.5 4.3 7.5-4.3"/></svg></div><div><strong>12</strong><span>Active donations</span></div></div>
+        <div class="metric"><div class="metric-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><strong>4 <em>today</em></strong><span>Pickups scheduled</span></div></div>
+        <div class="metric"><div class="metric-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 20h18M5 20V8l7-4 7 4v12M9 10h.01M15 10h.01M9 14h.01M15 14h.01M10 20v-3h4v3"/></svg></div><div><strong>8</strong><span>Community partners</span></div></div>
+        <div class="metric"><div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.4-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.6-8 11-8 11Z"/><path d="M8 12h8"/></svg></div><div><strong>3</strong><span>Unmatched requests</span></div></div>
+      </section>
+      <div class="content-grid">
+        <section class="panel" aria-labelledby="donationsTitle">
+          <div class="panel-head"><div><div class="panel-title" id="donationsTitle">Available food</div><div class="panel-subtitle">Fresh donations ready to find a home</div></div><button class="text-button" id="allDonations">View all <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div>
+          <div class="list-toolbar">
+            <div class="filters" role="group" aria-label="Filter donations">
+              <button class="filter active" data-filter="All">All food <span class="filter-count">12</span></button>
+              <button class="filter" data-filter="Produce">Produce</button>
+              <button class="filter" data-filter="Bakery">Bakery</button>
+              <button class="filter" data-filter="Prepared">Prepared</button>
+            </div>
+            <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input id="searchInput" type="search" placeholder="Search donations" aria-label="Search donations"></label>
+          </div>
+          <div id="donationList" aria-live="polite">
+            <article class="listing" data-category="Produce" data-name="Seasonal produce boxes">
+              <img class="food-photo" src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=240&q=80" alt="Fresh salad greens and vegetables">
+              <div class="listing-main"><div class="listing-title-row"><span class="listing-title">Seasonal produce boxes</span><span class="badge">Produce</span></div><div class="listing-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Pickup by 1:30 PM</span><span>0.4 mi away</span></div><div class="listing-org">Green Leaf Market · 3 boxes</div></div>
+              <div class="listing-action"><span class="qty">~ 28 lb</span><button data-claim="Seasonal produce boxes">Match recipient</button></div>
+            </article>
+            <article class="listing" data-category="Bakery" data-name="Assorted artisan bread">
+              <img class="food-photo" src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=240&q=80" alt="Fresh artisan loaves of bread">
+              <div class="listing-main"><div class="listing-title-row"><span class="listing-title">Assorted artisan bread</span><span class="badge">Bakery</span></div><div class="listing-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Pickup by 2:00 PM</span><span>0.8 mi away</span></div><div class="listing-org">Little Finch Bakery · 18 loaves</div></div>
+              <div class="listing-action"><span class="qty">~ 16 lb</span><button data-claim="Assorted artisan bread">Match recipient</button></div>
+            </article>
+            <article class="listing" data-category="Prepared" data-name="Warm lentil &amp; rice bowls">
+              <img class="food-photo" src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=240&q=80" alt="Prepared lentil and vegetable meal">
+              <div class="listing-main"><div class="listing-title-row"><span class="listing-title">Warm lentil &amp; rice bowls</span><span class="badge urgent">Urgent</span></div><div class="listing-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Pickup by 12:45 PM</span><span>1.1 mi away</span></div><div class="listing-org">Juniper Kitchen · 24 meals</div></div>
+              <div class="listing-action"><span class="qty">24 meals</span><button data-claim="Warm lentil &amp; rice bowls">Match recipient</button></div>
+            </article>
+            <article class="listing" data-category="Produce" data-name="Apples &amp; pears">
+              <img class="food-photo" src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=240&q=80" alt="Red and green apples">
+              <div class="listing-main"><div class="listing-title-row"><span class="listing-title">Apples &amp; pears</span><span class="badge">Produce</span></div><div class="listing-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Pickup by 4:00 PM</span><span>1.6 mi away</span></div><div class="listing-org">Rose City Co-op · 2 crates</div></div>
+              <div class="listing-action"><span class="qty">~ 35 lb</span><button data-claim="Apples &amp; pears">Match recipient</button></div>
+            </article>
+          </div>
+        </section>
+        <div class="right-stack">
+          <section class="panel" aria-labelledby="pickupTitle">
+            <div class="panel-head"><div><div class="panel-title" id="pickupTitle">Next pickups</div><div class="panel-subtitle" id="pickupDate"></div></div><button class="text-button" id="pickupCalendar">Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div>
+            <div class="pickup-list">
+              <div class="pickup"><span class="time-chip">12:45</span><div><strong>Juniper Kitchen</strong><small>Harbor House · 24 meals</small></div><span class="pickup-state">Confirmed</span></div>
+              <div class="pickup"><span class="time-chip">1:30</span><div><strong>Green Leaf Market</strong><small>Eastside Pantry · 3 boxes</small></div><span class="pickup-state">En route</span></div>
+              <div class="pickup"><span class="time-chip">2:00</span><div><strong>Little Finch Bakery</strong><small>Open Door Center · 18 loaves</small></div><span class="pickup-state">Confirmed</span></div>
+            </div>
+          </section>
+          <section class="panel" aria-labelledby="needsTitle">
+            <div class="panel-head"><div><div class="panel-title" id="needsTitle">Community needs</div><div class="panel-subtitle">Requests to match today</div></div><button class="text-button" id="allNeeds">See all <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div>
+            <div class="demand-list">
+              <div class="demand"><span class="demand-icon">HH</span><div><strong>Harbor House</strong><small>Prepared meals · 2.1 mi</small></div><span class="need">24 meals</span></div>
+              <div class="demand"><span class="demand-icon">EP</span><div><strong>Eastside Pantry</strong><small>Fresh produce · 0.9 mi</small></div><span class="need">3 crates</span></div>
+              <div class="demand"><span class="demand-icon">OC</span><div><strong>Open Door Center</strong><small>Bakery · 1.4 mi</small></div><span class="need">18 items</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <section class="workspace-page" data-page-view="Needs" aria-labelledby="needsPageTitle">
+        <div class="subpage-heading"><div><div class="eyebrow">Partner network / Live requests</div><h1 id="needsPageTitle">Community needs</h1><p>See what local organizations need and connect them with nearby surplus.</p></div></div>
+        <div class="board-summary" aria-label="Community request summary">
+          <div><strong>8</strong><span>Partner organizations</span></div>
+          <div><strong>5</strong><span>Open requests</span></div>
+          <div><strong>3</strong><span>Need a match today</span></div>
+        </div>
+        <div class="need-toolbar"><span class="board-label">Open requests near Eastside</span><div class="board-filters" role="group" aria-label="Filter community requests">
+          <button class="board-filter active" data-need-filter="All">All requests</button><button class="board-filter" data-need-filter="Produce">Produce</button><button class="board-filter" data-need-filter="Prepared">Prepared meals</button><button class="board-filter" data-need-filter="Bakery">Bakery</button>
+        </div></div>
+        <div class="need-grid" id="needBoard">
+          <article class="need-card" data-need-category="Prepared"><div class="need-card-top"><span class="demand-icon">HH</span><span class="priority">Needed today</span></div><h2>Harbor House</h2><div class="need-address">Community shelter · 2.1 mi away</div><div class="need-request"><span>Prepared meals</span><strong>24 meals</strong></div><p>Evening meal service for families staying at the shelter.</p><button class="primary" data-find-food="Prepared">Find prepared food</button></article>
+          <article class="need-card" data-need-category="Produce"><div class="need-card-top"><span class="demand-icon">EP</span><span class="priority">Needed today</span></div><h2>Eastside Pantry</h2><div class="need-address">Neighborhood pantry · 0.9 mi away</div><div class="need-request"><span>Fresh produce</span><strong>3 crates</strong></div><p>Fresh fruit and vegetables for weekly family food boxes.</p><button class="primary" data-find-food="Produce">Find produce</button></article>
+          <article class="need-card" data-need-category="Bakery"><div class="need-card-top"><span class="demand-icon">OC</span><span class="priority normal">Open request</span></div><h2>Open Door Center</h2><div class="need-address">Day center · 1.4 mi away</div><div class="need-request"><span>Bakery items</span><strong>18 items</strong></div><p>Individually packed snacks and bread for drop-in guests.</p><button class="primary" data-find-food="Bakery">Find bakery items</button></article>
+          <article class="need-card" data-need-category="Produce"><div class="need-card-top"><span class="demand-icon">MS</span><span class="priority normal">Open request</span></div><h2>Maple Street Shelter</h2><div class="need-address">Family shelter · 1.8 mi away</div><div class="need-request"><span>Fruit for breakfast</span><strong>2 crates</strong></div><p>Ready-to-eat fruit requested for tomorrow morning.</p><button class="primary" data-find-food="Produce">Find produce</button></article>
+          <article class="need-card" data-need-category="Prepared"><div class="need-card-top"><span class="demand-icon">CF</span><span class="priority normal">Open request</span></div><h2>Community Fridge</h2><div class="need-address">Mutual aid hub · 0.6 mi away</div><div class="need-request"><span>Ready-to-eat meals</span><strong>12 meals</strong></div><p>Vegetarian options are especially helpful for tonight.</p><button class="primary" data-find-food="Prepared">Find prepared food</button></article>
+          <article class="need-card" data-need-category="Bakery"><div class="need-card-top"><span class="demand-icon">NP</span><span class="priority normal">Open request</span></div><h2>New Paths Youth Center</h2><div class="need-address">After-school program · 2.7 mi away</div><div class="need-request"><span>Snacks and bread</span><strong>20 items</strong></div><p>Afternoon snacks for youth programs running this week.</p><button class="primary" data-find-food="Bakery">Find bakery items</button></article>
+        </div>
+      </section>
+      <section class="workspace-page" data-page-view="Pickups" aria-labelledby="pickupsPageTitle">
+        <div class="subpage-heading"><div><div class="eyebrow">Eastside / Route coordination</div><h1 id="pickupsPageTitle">Pickup schedule</h1><p>Coordinate handoffs between local food partners and community organizations.</p></div><button class="secondary" id="pickupRefresh">Refresh schedule</button></div>
+        <div class="board-summary" aria-label="Pickup schedule summary">
+          <div><strong>4</strong><span>Scheduled today</span></div>
+          <div><strong>1</strong><span>Currently en route</span></div>
+          <div><strong id="completedCount">0</strong><span>Completed here</span></div>
+        </div>
+        <div class="pickup-toolbar"><span class="board-label">Today's handoffs</span><div class="board-filters" role="group" aria-label="Filter pickups">
+          <button class="board-filter active" data-pickup-filter="All">All pickups</button><button class="board-filter" data-pickup-filter="Scheduled">Upcoming</button><button class="board-filter" data-pickup-filter="Completed">Completed</button>
+        </div></div>
+        <div class="pickup-board" id="pickupBoard">
+          <article class="pickup-card" data-status="Scheduled"><div class="pickup-date-block"><strong>12:45</strong><span>Today</span></div><div class="pickup-info"><h2>Juniper Kitchen</h2><p>24 lentil &amp; rice bowls · Harbor House</p><small>1.1 mi route · Prepared meals</small></div><div><span class="pickup-status">Confirmed</span><div class="pickup-actions"><button class="complete-pickup">Mark complete</button></div></div></article>
+          <article class="pickup-card" data-status="Scheduled"><div class="pickup-date-block"><strong>1:30</strong><span>Today</span></div><div class="pickup-info"><h2>Green Leaf Market</h2><p>3 produce boxes · Eastside Pantry</p><small>0.4 mi route · Fresh produce</small></div><div><span class="pickup-status">En route</span><div class="pickup-actions"><button class="complete-pickup">Mark complete</button></div></div></article>
+          <article class="pickup-card" data-status="Scheduled"><div class="pickup-date-block"><strong>2:00</strong><span>Today</span></div><div class="pickup-info"><h2>Little Finch Bakery</h2><p>18 artisan loaves · Open Door Center</p><small>0.8 mi route · Bakery</small></div><div><span class="pickup-status">Confirmed</span><div class="pickup-actions"><button class="complete-pickup">Mark complete</button></div></div></article>
+          <article class="pickup-card" data-status="Scheduled"><div class="pickup-date-block"><strong>9:15</strong><span>Tomorrow</span></div><div class="pickup-info"><h2>Rose City Co-op</h2><p>2 crates of apples &amp; pears · Maple Street Shelter</p><small>1.6 mi route · Fresh produce</small></div><div><span class="pickup-status">Pending confirmation</span><div class="pickup-actions"><button class="complete-pickup">Mark complete</button></div></div></article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <dialog id="donationDialog" aria-labelledby="dialogTitle">
+    <div class="dialog-head"><h2 id="dialogTitle">Post a food donation</h2><button class="close-dialog" type="button" aria-label="Close">&times;</button></div>
+    <form class="donation-form" id="donationForm">
+      <div class="field full"><label for="foodName">What food is available?</label><input id="foodName" name="foodName" required placeholder="e.g. Fresh seasonal vegetables"></div>
+      <div class="field"><label for="foodCategory">Food category</label><select id="foodCategory" name="foodCategory"><option>Produce</option><option>Bakery</option><option>Prepared</option><option>Dairy</option><option>Pantry</option></select></div>
+      <div class="field"><label for="foodQuantity">Quantity</label><input id="foodQuantity" name="foodQuantity" required placeholder="e.g. 3 boxes"></div>
+      <div class="field"><label for="pickupBy">Pickup by</label><input id="pickupBy" name="pickupBy" type="time" required value="15:00"></div>
+      <div class="field"><label for="foodLocation">Pickup location</label><input id="foodLocation" name="foodLocation" required placeholder="Business or address"></div>
+      <div class="form-actions"><button class="secondary" type="button" id="cancelDonation">Cancel</button><button class="primary" type="submit">Find a recipient</button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const now = new Date();
+    const todayText = new Intl.DateTimeFormat('en', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(now);
+    document.querySelector('#todayLabel').textContent = todayText;
+    document.querySelector('#pickupDate').textContent = new Intl.DateTimeFormat('en', { weekday: 'long', month: 'long', day: 'numeric' }).format(now);
+    const dialog = document.querySelector('#donationDialog');
+    const toast = document.querySelector('#toast');
+    let toastTimer;
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+    document.querySelector('#openDonation').addEventListener('click', () => dialog.showModal());
+    document.querySelector('.close-dialog').addEventListener('click', () => dialog.close());
+    document.querySelector('#cancelDonation').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+
+    const filters = [...document.querySelectorAll('.filter')];
+    const searchInput = document.querySelector('#searchInput');
+    let activeFilter = 'All';
+    function updateDonations() {
+      const query = searchInput.value.trim().toLowerCase();
+      let visible = 0;
+      document.querySelectorAll('.listing').forEach(item => {
+        const matchesFilter = activeFilter === 'All' || item.dataset.category === activeFilter;
+        const matchesQuery = item.dataset.name.toLowerCase().includes(query) || item.textContent.toLowerCase().includes(query);
+        item.hidden = !(matchesFilter && matchesQuery);
+        if (!item.hidden) visible++;
+      });
+      let empty = document.querySelector('.empty-state');
+      if (!visible && !empty) {
+        empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.textContent = 'No donations match. Try another search or category.';
+        document.querySelector('#donationList').append(empty);
+      } else if (visible && empty) empty.remove();
+    }
+    filters.forEach(button => button.addEventListener('click', () => {
+      filters.forEach(filter => filter.classList.toggle('active', filter === button));
+      activeFilter = button.dataset.filter;
+      updateDonations();
+    }));
+    searchInput.addEventListener('input', updateDonations);
+
+    document.querySelector('#donationForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const name = form.get('foodName').trim();
+      const category = form.get('foodCategory');
+      const quantity = form.get('foodQuantity').trim();
+      const pickup = new Date(`2000-01-01T${form.get('pickupBy')}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const location = form.get('foodLocation').trim();
+      const item = document.createElement('article');
+      item.className = 'listing';
+      item.dataset.category = category;
+      item.dataset.name = name;
+      item.innerHTML = `<div class="food-photo" aria-hidden="true" style="display:grid;place-items:center;color:#537b5b;font-size:20px">+</div><div class="listing-main"><div class="listing-title-row"><span class="listing-title"></span><span class="badge"></span></div><div class="listing-meta"><span>Pickup by ${pickup}</span><span>Just added</span></div><div class="listing-org"></div></div><div class="listing-action"><span class="qty"></span><button type="button">Match recipient</button></div>`;
+      item.querySelector('.listing-title').textContent = name;
+      item.querySelector('.badge').textContent = category;
+      item.querySelector('.listing-org').textContent = `${location} · Available now`;
+      item.querySelector('.qty').textContent = quantity;
+      item.querySelector('button').dataset.claim = name;
+      document.querySelector('#donationList').prepend(item);
+      document.querySelectorAll('.filter').forEach(filter => filter.classList.toggle('active', filter.dataset.filter === 'All'));
+      activeFilter = 'All';
+      searchInput.value = '';
+      updateDonations();
+      event.currentTarget.reset();
+      dialog.close();
+      showToast(`${name} posted. Finding nearby recipients.`);
+    });
+    const main = document.querySelector('main');
+    const pageCopy = {
+      Overview: { title: 'Good morning, Jordan', description: 'Here’s what’s happening across your neighborhood today.', eyebrow: todayText },
+      Donations: { title: 'Food donations', description: 'Browse surplus food and connect it with a nearby organization.', eyebrow: 'Food rescue / Live board' },
+      Needs: { title: 'Community needs', eyebrow: 'Partner network / Live requests' },
+      Pickups: { title: 'Pickup schedule', eyebrow: 'Eastside / Route coordination' }
+    };
+    const viewHashes = { Overview: '#overview', Donations: '#donations', Needs: '#needs', Pickups: '#pickups' };
+    function activateView(view) {
+      const currentView = pageCopy[view] ? view : 'Overview';
+      main.dataset.view = currentView;
+      document.querySelectorAll('[data-nav]').forEach(button => {
+        const isCurrent = button.dataset.nav === currentView;
+        button.classList.toggle('active', isCurrent);
+        if (isCurrent) button.setAttribute('aria-current', 'page');
+        else button.removeAttribute('aria-current');
+      });
+      document.querySelectorAll('[data-page-view]').forEach(page => page.classList.toggle('active', page.dataset.pageView === currentView));
+      document.querySelector('#breadcrumbCurrent').textContent = currentView === 'Needs' ? 'Community needs' : currentView === 'Pickups' ? 'Pickups' : currentView;
+      document.querySelector('#pageTitle').textContent = pageCopy[currentView].title;
+      document.querySelector('#todayLabel').textContent = pageCopy[currentView].eyebrow;
+      document.querySelector('#pageDescription').textContent = pageCopy[currentView].description || '';
+      document.title = `Common Table | ${currentView === 'Overview' ? 'Overview' : pageCopy[currentView].title}`;
+      window.scrollTo({ top: 0 });
+    }
+    function navigateTo(view) {
+      const hash = viewHashes[view] || viewHashes.Overview;
+      if (window.location.hash === hash) activateView(view);
+      else window.location.hash = hash;
+    }
+    function viewFromHash() {
+      const entry = Object.entries(viewHashes).find(([, hash]) => hash === window.location.hash);
+      activateView(entry ? entry[0] : 'Overview');
+    }
+    document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => navigateTo(button.dataset.nav)));
+    window.addEventListener('hashchange', viewFromHash);
+    viewFromHash();
+
+    const recipientByCategory = { Produce: 'Eastside Pantry', Bakery: 'Open Door Center', Prepared: 'Harbor House' };
+    function matchDonation(button) {
+      const listing = button.closest('.listing');
+      const name = button.dataset.claim || listing.querySelector('.listing-title').textContent;
+      const recipient = recipientByCategory[listing.dataset.category] || 'a nearby partner';
+      button.textContent = 'Matched';
+      button.disabled = true;
+      showToast(`${name} matched with ${recipient}.`);
+    }
+    document.querySelector('#donationList').addEventListener('click', event => {
+      const button = event.target.closest('[data-claim]');
+      if (button) matchDonation(button);
+    });
+
+    document.querySelectorAll('[data-need-filter]').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('[data-need-filter]').forEach(filter => filter.classList.toggle('active', filter === button));
+      document.querySelectorAll('.need-card').forEach(card => {
+        card.hidden = button.dataset.needFilter !== 'All' && card.dataset.needCategory !== button.dataset.needFilter;
+      });
+    }));
+    document.querySelectorAll('[data-find-food]').forEach(button => button.addEventListener('click', () => {
+      navigateTo('Donations');
+      searchInput.value = '';
+      const filter = document.querySelector(`[data-filter="${button.dataset.findFood}"]`);
+      filter.click();
+      showToast(`Showing ${button.dataset.findFood.toLowerCase()} donations for this request.`);
+    }));
+
+    document.querySelectorAll('[data-pickup-filter]').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('[data-pickup-filter]').forEach(filter => filter.classList.toggle('active', filter === button));
+      document.querySelectorAll('.pickup-card').forEach(card => {
+        card.hidden = button.dataset.pickupFilter !== 'All' && card.dataset.status !== button.dataset.pickupFilter;
+      });
+    }));
+    document.querySelectorAll('.complete-pickup').forEach(button => button.addEventListener('click', () => {
+      const card = button.closest('.pickup-card');
+      card.dataset.status = 'Completed';
+      card.classList.add('completed');
+      card.querySelector('.pickup-status').textContent = 'Completed';
+      button.textContent = 'Completed';
+      button.disabled = true;
+      document.querySelector('#completedCount').textContent = document.querySelectorAll('.pickup-card.completed').length;
+      showToast(`${card.querySelector('h2').textContent} pickup marked complete.`);
+    }));
+    document.querySelector('#inviteButton').addEventListener('click', () => showToast('Partner invitation link copied.'));
+    document.querySelector('#notifications').addEventListener('click', () => showToast('You’re all caught up on neighborhood updates.'));
+    document.querySelector('#allDonations').addEventListener('click', () => navigateTo('Donations'));
+    document.querySelector('#pickupCalendar').addEventListener('click', () => navigateTo('Pickups'));
+    document.querySelector('#allNeeds').addEventListener('click', () => navigateTo('Needs'));
+    document.querySelector('#pickupRefresh').addEventListener('click', () => {
+      document.querySelector('[data-pickup-filter="All"]').click();
+      showToast('Pickup schedule is up to date.');
+    });
+  </script>
+</body>
+</html>
